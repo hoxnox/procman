@@ -1,5 +1,5 @@
-/**@author $username$ <$usermail$>
- * @date $date$
+/**@author hoxnox <hoxnox@gmail.com>
+ * @date 20160531 16:13:29
  *
  * @brief procman test launcher.*/
 
@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 // test cases
+#include "test_proc_builder.hpp"
 
 int main(int argc, char *argv[])
 {
