@@ -1,25 +1,9 @@
-# @author $username$ <$usermail$>
-# @date $date$
+# @author hoxnox <hoxnox@gmail.com>
+# @date 20160531 16:13:29
 # procman cmake tests build script
 
 find_package(Threads)
 list(APPEND LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
-
-function(add_gtests gtname sources)
-    foreach(source ${sources})
-        file(READ "${source}" contents)
-        string(REGEX MATCHALL "TEST_?F?\\(([A-Za-z_0-9 ,]+)\\)"
-               found_tests ${contents})
-        foreach(hit ${found_tests})
-            string(REGEX REPLACE
-                   ".*\\( *([A-Za-z_0-9]+), *([A-Za-z_0-9]+) *\\).*" "\\1.\\2"
-                   test_name ${hit})
-            add_test("${gtname}-${test_name}"
-                     test_${gtname}_${PROJECT_NAME}
-                     --gtest_filter=${test_name})
-        endforeach()
-    endforeach()
-endfunction()
 
 if (NOT USE_SYSTEM_GTEST)
     include(ExternalProject)
@@ -56,10 +40,20 @@ endif()
 include_directories(${GTEST_INCLUDE_DIRS})
 list(APPEND LIBRARIES ${GTEST_LIBRARIES})
 
-set(TEST_UNIT_SRC
-        test.cpp)
-add_executable(test_unit_${PROJECT_NAME} ${TEST_UNIT_SRC})
-add_dependencies(test_unit_${PROJECT_NAME} gtestlib)
-target_link_libraries(test_unit_${PROJECT_NAME} ${LIBRARIES})
-add_gtests("unit" "${TEST_UNIT_SRC}")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_all" "#!/bin/sh\n\n")
+function(test n)
+	add_executable(${n} ../src/procman.cpp test.cpp)
+	set_property(TARGET ${n} PROPERTY COMPILE_DEFINITIONS ${n})
+	add_dependencies(${n} gtestlib)
+	target_link_libraries(${n} ${LIBRARIES})
+	file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/test_all" "./test/${n}\n")
+endfunction()
+
+test(test_stop_normal)
+test(test_stop_signal)
+test(test_pid_file)
+
+file(INSTALL "${CMAKE_CURRENT_BINARY_DIR}/test_all"
+	DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/.."
+	FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE)
 

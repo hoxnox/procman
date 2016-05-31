@@ -1,4 +1,5 @@
 *.swp
 *.swo
+src/procman_config.h
 build
 src/$NULL$_config.h
