@@ -1,4 +1,5 @@
-# Process Manager
+Process Manager
+===============
 
 Process Manager (procman) helps to create daemons and applications that
 is sensible to process properties. When the application starts in UNIX
@@ -34,118 +35,121 @@ Below are problems, that procman helps to solve:
 You don't have to do all the listed above. You can configure exactly
 what you need for your particular case - see "Example: fine tuning".
 
-# Building
+Building
+--------
 
 The library is very small - just one `cpp` file. You can build it as
 usual library with help of cmake:
 
-    ```sh
-    cd ~/procman
-    mkdir build
-    cd build
-    cmake -DCMAKE_INSTALL_PREFIX=/path/to/procman ..
-    make install 
-    g++ -std=c++11 -I /path/to/procman/include -L /path/to/procman/lib test.cpp -l procman
-    ```
+```sh
+cd ~/procman
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=/path/to/procman ..
+make install 
+g++ -std=c++11 -I /path/to/procman/include -L /path/to/procman/lib test.cpp -l procman
+```
 
 or by hand:
 
-    ```sh
-    g++ -std=c++11 -c -o procman.o ~/procman/src/procman.cpp
-    g++ -std=c++11 -I ~/procman/include test.cpp ptocman.o
-    ```
+```sh
+g++ -std=c++11 -c -o procman.o ~/procman/src/procman.cpp
+g++ -std=c++11 -I ~/procman/include test.cpp ptocman.o
+```
 
 
-# Examples
+Examples
+--------
 
 Watch your messages:
 
-    ```sh
-    sudo tail -f /var/log/messages
-    ```
+```sh
+sudo tail -f /var/log/messages
+```
 
 Launch the example and play with it - try to launch several copies, send
 signals with help of kill:
 
-    ```sh
-    kill -s SIGHUP <PID>
-    ```
+```sh
+kill -s SIGHUP <PID>
+```
 
-## daemonize
+### daemonize
 
 The code below is fully functional daemon with `PID` at `/var/run/my_daemon.pid`.
 
-    ```c++
-    #include <syslog.h>
-    #include <unistd.h>
-    
-    #include <procman.hpp>
-    
-    using namespace procman;
-    
-    int
-    main(int argc, char* argv[])
-    {
-    	bool stop = false;
-    	openlog("my_daemon", 0, LOG_USER);
-    	auto pm = proc_builder("my_daemon").daemonize()
-    		.on_stop([&stop](){ syslog(LOG_INFO, "stopped"); stop = true; })
-    		.on_hup([](){ syslog(LOG_INFO, "config update"); })
-    		.on_start([&stop]()
-    			{
-    				syslog(LOG_INFO, "started");
-    				while (!stop)
-    					usleep(100);
-    			});
-    	if (!pm.start())
-    		syslog(LOG_ERR, "Process error: %s", pm.strerror().c_str());
-    	return 0;
-    }
-    ```
+```c++
+#include <syslog.h>
+#include <unistd.h>
 
-## fine tuning
+#include <procman.hpp>
+
+using namespace procman;
+
+int
+main(int argc, char* argv[])
+{
+	bool stop = false;
+	openlog("my_daemon", 0, LOG_USER);
+	auto pm = proc_builder("my_daemon").daemonize()
+		.on_stop([&stop](){ syslog(LOG_INFO, "stopped"); stop = true; })
+		.on_hup([](){ syslog(LOG_INFO, "config update"); })
+		.on_start([&stop]()
+			{
+				syslog(LOG_INFO, "started");
+				while (!stop)
+					usleep(100);
+			});
+	if (!pm.start())
+		syslog(LOG_ERR, "Process error: %s", pm.strerror().c_str());
+	return 0;
+}
+```
+
+### fine tuning
+
 
 Try to start several instances and send them `SIGHUP` and `SIGTERM`.
 
-    ```c++
-    #include <syslog.h>
-    #include <unistd.h>
-    #include <iostream>
-    
-    #include <procman.hpp>
-    
-    using namespace procman;
-    
-    int
-    main(int argc, char* argv[])
-    {
-    	bool stop = false;
-    	openlog("my_daemon", 0, LOG_USER);
-    	auto pm = proc_builder("my_daemon")
-    		.set_work_dir("/tmp")
-    		.set_no_control_tty()
-    		.on_stop([&stop](process::stop_reason_t reason)
-    			{
-    				if (reason == process::STOP_SIGNAL)
-    					syslog(LOG_INFO, "stopped signal");
-    				syslog(LOG_INFO, "stopped normal");
-    				stop = true;
-    			})
-    		.on_hup([](std::shared_ptr<process> p) // set_signals() automatically
-    			{
-    				syslog(LOG_ERR, "imagine error, normal stop");
-    				p->stop();
-    			})
-    		.on_start([&stop]()
-    			{
-    				syslog(LOG_INFO, "started");
-    				std::cout << getpid() << std::endl;
-    				while (!stop)
-    					usleep(100);
-    			});
-    	if (!pm.start())
-    		syslog(LOG_ERR, "Process error: %s", pm.strerror().c_str());
-    	return 0;
-    }
-    ```
+```c++
+#include <syslog.h>
+#include <unistd.h>
+#include <iostream>
+
+#include <procman.hpp>
+
+using namespace procman;
+
+int
+main(int argc, char* argv[])
+{
+	bool stop = false;
+	openlog("my_daemon", 0, LOG_USER);
+	auto pm = proc_builder("my_daemon")
+		.set_work_dir("/tmp")
+		.set_no_control_tty()
+		.on_stop([&stop](process::stop_reason_t reason)
+			{
+				if (reason == process::STOP_SIGNAL)
+					syslog(LOG_INFO, "stopped signal");
+				syslog(LOG_INFO, "stopped normal");
+				stop = true;
+			})
+		.on_hup([](std::shared_ptr<process> p) // set_signals() automatically
+			{
+				syslog(LOG_ERR, "imagine error, normal stop");
+				p->stop();
+			})
+		.on_start([&stop]()
+			{
+				syslog(LOG_INFO, "started");
+				std::cout << getpid() << std::endl;
+				while (!stop)
+					usleep(100);
+			});
+	if (!pm.start())
+		syslog(LOG_ERR, "Process error: %s", pm.strerror().c_str());
+	return 0;
+}
+```
 
