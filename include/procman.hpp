@@ -26,7 +26,7 @@ public:
 	/**Stop current process.*/
 	void stop(stop_reason_t reason = STOP_NORMAL);
 	/**Get current process instance.*/
-	static std::shared_ptr<process> Get() { return impl_; }
+	static std::shared_ptr<process> get() { return impl_; }
 	void emit(int signal);
 
 private:
