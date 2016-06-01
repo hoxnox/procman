@@ -119,10 +119,10 @@ do_pid_file(std::string filename, int& fd)
 		                << _(" Pidfile: \"") << filename.c_str() << "\""
 		                << _(" Message: ") << strerror(errno);
 	}
-	ftruncate(fd, 0);
+	auto _ = ftruncate(fd, 0);
 	std::stringstream ss;
 	ss << getpid();
-	write(fd, ss.str().c_str(), ss.str().length());
+	_ = write(fd, ss.str().c_str(), ss.str().length());
 	return Result::OK;
 }
 
@@ -221,7 +221,7 @@ process::emit(int signal)
 void
 signal_handler(int sig, siginfo_t *si, void* ptr)
 {
-	auto proc = process::Get();
+	auto proc = process::get();
 	if (!proc)
 		return;
 	proc->emit(sig);
