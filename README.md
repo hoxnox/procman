@@ -76,7 +76,11 @@ kill -s SIGHUP <PID>
 
 ### daemonize
 
-The code below is fully functional daemon with `PID` at `/var/run/my_daemon.pid`.
+The code below is fully functional daemon with `PID` at `/tmp/my_daemon.pid`.
+
+> Default daemonize set PID at `/var/run/<name>.pid`. But I decided to
+> change this location to `/tmp/my_daemon.pid` - in that case you don't
+> need root privileges to start the daemon.
 
 ```c++
 #include <syslog.h>
@@ -92,6 +96,7 @@ main(int argc, char* argv[])
 	bool stop = false;
 	openlog("my_daemon", 0, LOG_USER);
 	auto pm = proc_builder("my_daemon").daemonize()
+		.set_pid_file("/tmp/my_daemon.pid")
 		.on_stop([&stop](){ syslog(LOG_INFO, "stopped"); stop = true; })
 		.on_hup([](){ syslog(LOG_INFO, "config update"); })
 		.on_start([&stop]()
