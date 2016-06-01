@@ -93,7 +93,7 @@ lockfile(int fd)
 	fl.l_type = F_WRLCK;
 	fl.l_start = 0;
 	fl.l_whence = SEEK_SET;
-	fl.l_len = 0;
+	fl.l_len = 10;
 	return fcntl(fd, F_SETLK, &fl);
 }
 
@@ -119,6 +119,7 @@ do_pid_file(std::string filename, int& fd)
 		                << _(" Pidfile: \"") << filename.c_str() << "\""
 		                << _(" Message: ") << strerror(errno);
 	}
+	ftruncate(fd, 0);
 	std::stringstream ss;
 	ss << getpid();
 	write(fd, ss.str().c_str(), ss.str().length());
@@ -260,16 +261,16 @@ proc_builder::start()
 		rs = do_no_cntl_tty();
 	if (rs && (process_->opts_ & process::OPT_SET_SIGNALS))
 		rs = do_signals(process_);
+	if (rs && (process_->opts_ & process::OPT_SET_WORKDIR))
+		rs = do_work_dir(process_->workdir_);
+	if (rs && (process_->opts_ & process::OPT_NO_STD_FD))
+		rs = do_no_std_fd();
 	if (rs && (process_->opts_ & process::OPT_SET_PID))
 	{
 		rs = do_pid_file(process_->pidfile_, process_->pidfd_);
 		if (!rs)
 			process_->pidfile_.clear();
 	}
-	if (rs && (process_->opts_ & process::OPT_SET_WORKDIR))
-		rs = do_work_dir(process_->workdir_);
-	if (rs && (process_->opts_ & process::OPT_NO_STD_FD))
-		rs = do_no_std_fd();
 	if (!rs)
 	{
 		last_error_.assign((const char*)rs);
