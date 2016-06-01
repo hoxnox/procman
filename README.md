@@ -42,6 +42,8 @@ The library is very small - just one `cpp` file. You can build it as
 usual library with help of cmake:
 
 ```sh
+cd ~
+git clone https://github.com/hoxnox/procman
 cd ~/procman
 mkdir build
 cd build
@@ -53,7 +55,9 @@ g++ -std=c++11 -I /path/to/procman/include -L /path/to/procman/lib test.cpp -l p
 or by hand:
 
 ```sh
-g++ -std=c++11 -c -o procman.o ~/procman/src/procman.cpp
+cd ~
+git clone https://github.com/hoxnox/procman
+g++ -std=c++11 -I ~/procman/include -c -o procman.o ~/procman/src/procman.cpp
 g++ -std=c++11 -I ~/procman/include test.cpp ptocman.o
 ```
 
