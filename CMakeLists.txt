@@ -17,7 +17,7 @@ project(procman)
 
 set(procman_VERSION_MAJOR 0)
 set(procman_VERSION_MINOR 0)
-set(procman_VERSION_PATCH 0)
+set(procman_VERSION_PATCH 1)
 # configuration header
 configure_file(
 	"${PROJECT_SOURCE_DIR}/src/procman_config.cfg"
@@ -30,6 +30,11 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
 
 include_directories("${PROJECT_SOURCE_DIR}/include")
 add_definitions("-std=c++11")
+
+########################################################################
+# procman
+
+add_library(procman ./src/procman.cpp)
 
 ########################################################################
 # tests and docs
@@ -48,21 +53,12 @@ endif()
 
 set(CPACK_SET_DESTDIR ON)
 
-#INSTALL(TARGETS
-#	targetname
-#	DESTINATION bin)
-#INSTALL(FILES filepath DESTINATION bin
-#	PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
-#	            GROUP_EXECUTE GROUP_READ
-#	            WORLD_READ WORLD_EXECUTE)
-#INSTALL(DIRECTORY domedir DESTINATION share/${PROJECT_NAME})
+INSTALL(TARGETS procman DESTINATION lib)
+INSTALL(FILES include/procman.hpp DESTINATION include
+	PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
 SET(CPACK_PACKAGE_NAME procman)
-#if (WITH_SYSTEM_SOMELIB)
-#	SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libsomelib (>=1.1.1)")
-#	SET(CPACK_RPM_PACKAGE_REQUIRES "libsomelib >= 1.1.1")
-#endif()
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "")
-SET(CPACK_PACKAGE_VENDOR "$uername$ <hoxnox@gmail.com>")
+SET(CPACK_PACKAGE_VENDOR "Kim Merder <hoxnox@gmail.com>")
 SET(CPACK_PACKAGE_CONTACT ${CPACK_PACKAGE_VENDOR})
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.markdown")
 SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
@@ -74,3 +70,4 @@ SET(CPACK_RPM_PACKAGE_GROUP "Applications/System")
 SET(CPACK_RPM_PACKAGE_LICENSE "MIT")
 SET(CPACK_STRIP_FILES TRUE)
 INCLUDE(CPack)
+

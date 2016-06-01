@@ -97,19 +97,32 @@ public:
 	/**@brief Callback on starting.*/
 	proc_builder& on_start(
 		std::function<void(std::shared_ptr<process>)> callback);
+	proc_builder& on_start(std::function<void()> callback);
+
 	/**@brief Callback on stopping.*/
 	proc_builder& on_stop(
 		std::function<void(process::stop_reason_t,
 		                   std::shared_ptr<process>)> callback);
+	proc_builder& on_stop(
+		std::function<void(process::stop_reason_t)> callback);
+	proc_builder& on_stop(
+		std::function<void(std::shared_ptr<process>)> callback);
+	proc_builder& on_stop(std::function<void()> callback);
+
 	/**@brief Callback on SIGHUP receiving.*/
 	proc_builder& on_hup(
 		std::function<void(std::shared_ptr<process>)> callback);
+	proc_builder& on_hup(std::function<void()> callback);
+
 	/**@brief Callback on SIGUSR1 receiving.*/
 	proc_builder& on_usr1(
 		std::function<void(std::shared_ptr<process>)> callback);
+	proc_builder& on_usr1(std::function<void()> callback);
+
 	/**@brief Callback on SIGUSR2 receiving.*/
 	proc_builder& on_usr2(
 		std::function<void(std::shared_ptr<process>)> callback);
+	proc_builder& on_usr2(std::function<void()> callback);
 
 private:
 	std::shared_ptr<process> process_;
@@ -203,6 +216,13 @@ proc_builder::on_start(std::function<void(std::shared_ptr<process>)> callback)
 }
 
 inline proc_builder&
+proc_builder::on_start(std::function<void()> callback)
+{
+	process_->on_start_ = [callback](std::shared_ptr<process>){ callback(); };
+	return *this;
+}
+
+inline proc_builder&
 proc_builder::on_stop(std::function<void(process::stop_reason_t,
 	                  std::shared_ptr<process>)> callback)
 {
@@ -210,6 +230,32 @@ proc_builder::on_stop(std::function<void(process::stop_reason_t,
 	return *this;
 }
 
+inline proc_builder&
+proc_builder::on_stop(std::function<void(process::stop_reason_t)> callback)
+{
+	process_->on_stop_ = [callback](process::stop_reason_t reason,
+	                                std::shared_ptr<process> )
+	                               { callback(reason); };
+	return *this;
+}
+
+inline proc_builder&
+proc_builder::on_stop(std::function<void(std::shared_ptr<process>)> callback)
+{
+	process_->on_stop_ = [callback](process::stop_reason_t,
+	                                std::shared_ptr<process> p)
+	                               { callback(p); };
+	return *this;
+}
+
+inline proc_builder&
+proc_builder::on_stop(std::function<void()> callback)
+{
+	process_->on_stop_ = [callback](process::stop_reason_t,
+	                                std::shared_ptr<process>)
+	                               { callback(); };
+	return *this;
+}
 
 inline proc_builder&
 proc_builder::on_hup(std::function<void(std::shared_ptr<process>)> callback)
@@ -219,6 +265,13 @@ proc_builder::on_hup(std::function<void(std::shared_ptr<process>)> callback)
 	return *this;
 }
 
+inline proc_builder&
+proc_builder::on_hup(std::function<void()> callback)
+{
+	set_signals();
+	process_->on_hup_ = [callback](std::shared_ptr<process>){callback();};
+	return *this;
+}
 
 inline proc_builder&
 proc_builder::on_usr1(std::function<void(std::shared_ptr<process>)> callback)
@@ -229,10 +282,26 @@ proc_builder::on_usr1(std::function<void(std::shared_ptr<process>)> callback)
 }
 
 inline proc_builder&
+proc_builder::on_usr1(std::function<void()> callback)
+{
+	set_signals();
+	process_->on_usr1_ = [callback](std::shared_ptr<process>){ callback(); };
+	return *this;
+}
+
+inline proc_builder&
 proc_builder::on_usr2(std::function<void(std::shared_ptr<process>)> callback)
 {
 	set_signals();
 	process_->on_usr2_ = callback;
+	return *this;
+}
+
+inline proc_builder&
+proc_builder::on_usr2(std::function<void()> callback)
+{
+	set_signals();
+	process_->on_usr2_ = [callback](std::shared_ptr<process>){ callback(); };
 	return *this;
 }
 
