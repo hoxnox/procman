@@ -11,6 +11,7 @@ class ProcmanSSLConan(NxConanFile):
     settings = "os", "compiler", "build_type", "arch"
     build_policy = "missing"
     description = "Process Manager (procman) helps to create daemons and applications that is sensible to process properties."
+    options = {}
 
     def do_source(self):
         self.retrieve("f0d77cbd96961780ac4b11a118ec0314bf964d6ab6f23782e69a1c7ab80385a7",
