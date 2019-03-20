@@ -14,7 +14,7 @@ class ProcmanSSLConan(NxConanFile):
     options = {}
 
     def do_source(self):
-        self.retrieve("93e77ad7819b903db0962e03e67069dd8ef39485f7e0f4de996006d81e78ab2b",
+        self.retrieve("d278336f4a902aa9e31d02854b73db3f854c5495d15f91b94cb87a153b7c06db",
                 [
                     "vendor://hoxnox/procman/procman-{v}.tar.gz".format(v=self.version),
                     "https://github.com/hoxnox/procman/archive/{v}.tar.gz".format(v=self.version)
