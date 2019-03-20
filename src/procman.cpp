@@ -37,6 +37,7 @@ public:
 	{
 		return err_.str().c_str();
 	}
+	std::string str() { return err_.str(); }
 	Result& operator<<(std::string str)
 	{
 		err_ << str;
@@ -273,7 +274,7 @@ proc_builder::start()
 	}
 	if (!rs)
 	{
-		last_error_.assign((const char*)rs);
+		last_error_ = rs.str();
 		return nullptr;
 	}
 	if (process_->on_start_)
