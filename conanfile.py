@@ -4,7 +4,7 @@ from conans import CMake, tools
 
 class ProcmanSSLConan(NxConanFile):
     name = "procman"
-    version = "0.0.1"
+    version = "0.0.2"
     license = "OpenBSD"
     url = "https://github.com/hoxnox/procman"
     license = "https://github.com/hoxnox/procman/blob/master/LICENSE"
@@ -14,7 +14,7 @@ class ProcmanSSLConan(NxConanFile):
     options = {}
 
     def do_source(self):
-        self.retrieve("f0d77cbd96961780ac4b11a118ec0314bf964d6ab6f23782e69a1c7ab80385a7",
+        self.retrieve("c861992fef59ebde4168f074ec159d8477dc4fbcbda3bc61b2932f08d08ea072",
                 [
                     "vendor://hoxnox/procman/procman-{v}.tar.gz".format(v=self.version),
                     "https://github.com/hoxnox/procman/archive/{v}.tar.gz".format(v=self.version)
