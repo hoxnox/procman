@@ -136,7 +136,7 @@ process::~process()
 Result
 do_work_dir(std::string filename = "/")
 {
-	if (chdir("/") < 0)
+	if (chdir(filename.c_str()) < 0)
 	{
 		return Result() << _("Error changing working directory.")
 		                << _(" Message: ") << strerror(errno);
