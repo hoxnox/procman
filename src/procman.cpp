@@ -28,7 +28,7 @@ class Result
 public:
 	Result() {};
 	Result(const Result& copy) { operator=(copy); }
-	Result& operator=(const Result& copy) {err_.str(copy.err_.str()); }
+	Result& operator=(const Result& copy) {err_.str(copy.err_.str()); return *this; }
 	operator bool()
 	{
 		return err_.str().empty();
