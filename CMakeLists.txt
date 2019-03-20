@@ -17,7 +17,7 @@ project(procman)
 
 set(procman_VERSION_MAJOR 0)
 set(procman_VERSION_MINOR 0)
-set(procman_VERSION_PATCH 1)
+set(procman_VERSION_PATCH 2)
 # configuration header
 configure_file(
 	"${PROJECT_SOURCE_DIR}/src/procman_config.cfg"
